@@ -36,6 +36,7 @@ public class Highway {
       Interval covered = new Interval(x0, x1);
       gaps.remove(covered);
     }
+    // adding a comment - test
     double uncovered = gaps.sum();
     System.out.printf("Not covered: %7.1f%n", uncovered);
     double pct = 100.0 * ((xMax - xMin) - uncovered) / (xMax - xMin);
