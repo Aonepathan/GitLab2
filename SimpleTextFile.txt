@@ -1,1 +1,1 @@
-git@github.com:CS-350-Summer-2022/gaps-basic-Aonepathan.git
+git@github.com:Aonepathan/GitLab2.git
