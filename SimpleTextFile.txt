@@ -1,1 +1,0 @@
-git@github.com:Aonepathan/GitLab2.git
