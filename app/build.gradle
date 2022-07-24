@@ -1,5 +1,6 @@
 plugins {
-    id 'application' 
+    id 'application'
+    id "org.xbib.gradle.plugin.git" version "2.0.0"
 }
 
 repositories {
@@ -18,4 +19,67 @@ application {
 
 tasks.named('test') {
     useJUnitPlatform() 
+}
+
+// make sure test and javadoc gradle tasks run
+// task reports() {
+//     dir 'app'
+//     tasks 'test', 'javadoc'
+// }
+
+task clonePages() {
+    doLast {
+        mkdir 'build/gh-pages'
+        def thisRepo = rootProject.projectDir.toString()
+        def pagesDir = "$buildDir/gh-pages"
+        project.delete {
+            delete pagesDir
+        }
+        def grgit = git.clone {
+            dir = pagesDir
+            uri = 'file:' + thisRepo
+            bare = false
+            refToCheckout = 'gh-pages'
+        }
+        grgit.checkout {
+            branch = 'gh-pages'
+        }
+        grgit.close()
+    }
+}
+
+task copyReports (dependsOn: 'clonePages') {
+    doLast {
+        ant.copy (todir: 'build/gh-pages') {
+            fileset(dir: 'build/jbake')
+        }
+    }
+}
+
+task updateGHPages (dependsOn: 'copyReports') {
+    group = "Reporting"
+    description  'Copies reports to the gh-pages branch in preparation for a future push to GitHub'
+    doLast {
+        def pagesDir = "$buildDir/gh-pages"
+        def grgit = git.open {
+            dir = pagesDir + "/.git"
+        }
+        grgit.add (update: false, patterns: ['reports/'])
+        grgit.add (update: true, patterns: ['reports/'])
+        grgit.commit {
+            message = "Updating web pages"
+        }
+        grgit.push {}
+        grgit.close()
+    }
+}
+
+task deployReports (dependsOn: 'updateGHPages') {
+    doLast{
+        def grgit = git.checkout {
+                    branch = 'gh-pages'
+                }
+            grgit.push {}
+            grgit.close()
+    }
 }
