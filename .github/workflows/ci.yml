@@ -19,3 +19,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: ../gradlew build             
     - name: Build and test
+    
